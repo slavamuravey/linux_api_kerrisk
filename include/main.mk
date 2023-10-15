@@ -10,9 +10,8 @@ OBJMODULES = $(SRCMODULES:.c=.o)
 run: clean main
 	./main
 
-shell: main.c $(OBJMODULES)
+main: main.c $(OBJMODULES)
 	$(CC) $(CFLAGS) $^ -o $@
-
 
 .PHONY: clean
 clean:
