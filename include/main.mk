@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -g -Wall -ansi -pedantic
+CFLAGS ?= -g -Wall -ansi -pedantic
 SRCMODULES ?= 
 OBJMODULES = $(SRCMODULES:.c=.o)
 
