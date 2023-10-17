@@ -1,6 +1,6 @@
 CC = gcc
 CFLAGS = -g -Wall -ansi -pedantic
-SRCMODULES = 
+SRCMODULES ?= 
 OBJMODULES = $(SRCMODULES:.c=.o)
 
 %.o: %.c %.h
@@ -15,4 +15,4 @@ main: main.c $(OBJMODULES)
 
 .PHONY: clean
 clean:
-	rm -f *.o main *_test
+	rm -f *.o main

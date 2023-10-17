@@ -4,6 +4,13 @@
         "array": "c",
         "string_view": "c",
         "initializer_list": "c",
-        "utility": "c"
+        "utility": "c",
+        "stdio.h": "c",
+        "types.h": "c",
+        "*.inc": "c",
+        "tlpi_hdr.h": "c",
+        "get_num.h": "c",
+        "error_functions.h": "c",
+        "stdarg.h": "c"
     }
 }
