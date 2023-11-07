@@ -11,6 +11,7 @@
         "tlpi_hdr.h": "c",
         "get_num.h": "c",
         "error_functions.h": "c",
-        "stdarg.h": "c"
+        "stdarg.h": "c",
+        "setjmp.h": "c"
     }
 }
