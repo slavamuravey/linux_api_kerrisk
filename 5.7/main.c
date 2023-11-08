@@ -12,7 +12,8 @@
 ssize_t my_readv(int fd, const struct iovec *iov, int iovcnt)
 {
     int i;
-    size_t requested_bytes = 0, read_bytes, tmp_bytes;
+    size_t requested_bytes = 0;
+    ssize_t read_bytes, tmp_bytes;
     char *buf, *tmp_buf;
 
     if (iovcnt < 0 || iovcnt > IOV_MAX) {
@@ -56,7 +57,8 @@ ssize_t my_readv(int fd, const struct iovec *iov, int iovcnt)
 ssize_t my_writev(int fd, const struct iovec *iov, int iovcnt)
 {
     int i;
-    size_t requested_bytes = 0, write_bytes;
+    size_t requested_bytes = 0;
+    ssize_t write_bytes;
     char *buf, *tmp_buf;
     if (iovcnt < 0 || iovcnt > IOV_MAX) {
         errno = EINVAL;
@@ -97,7 +99,7 @@ int main()
     size_t total_len = 0;
     struct iovec iov[3];
 
-    size_t read_bytes;
+    ssize_t read_bytes;
     char *readv_filename = "readv.dat";
     char *writev_filename = "writev.dat";
     int fd;
@@ -135,7 +137,7 @@ int main()
         exit(1);
     }
 
-    read_bytes = my_writev(fd, iov, 3);
+    my_writev(fd, iov, 3);
 
     return 0;
 }
