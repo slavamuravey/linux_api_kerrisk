@@ -12,6 +12,12 @@
         "get_num.h": "c",
         "error_functions.h": "c",
         "stdarg.h": "c",
-        "setjmp.h": "c"
+        "setjmp.h": "c",
+        "limits.h": "c",
+        "uio.h": "c",
+        "uio_lim.h": "c",
+        "xopen_lim.h": "c",
+        "cerrno": "c",
+        "errno.h": "c"
     }
 }
