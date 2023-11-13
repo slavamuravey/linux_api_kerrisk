@@ -18,6 +18,7 @@
         "uio_lim.h": "c",
         "xopen_lim.h": "c",
         "cerrno": "c",
-        "errno.h": "c"
+        "errno.h": "c",
+        "signal_functions.h": "c"
     }
 }
