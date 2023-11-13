@@ -20,6 +20,7 @@
         "cerrno": "c",
         "errno.h": "c",
         "signal_functions.h": "c",
-        "signal.h": "c"
+        "signal.h": "c",
+        "strings.h": "c"
     }
 }
