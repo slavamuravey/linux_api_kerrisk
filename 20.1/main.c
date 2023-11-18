@@ -21,6 +21,7 @@ sighandler_t my_signal(int sig, sighandler_t handler)
     memset(&act, 0, sizeof(struct sigaction));
     sigemptyset(&act.sa_mask);
     act.sa_handler = handler;
+    act.sa_flags = SA_RESTART;
     if (sigaction(sig, &act, &oact) == -1) {
         return SIG_ERR;
     }
