@@ -21,6 +21,8 @@
         "errno.h": "c",
         "signal_functions.h": "c",
         "signal.h": "c",
-        "strings.h": "c"
+        "strings.h": "c",
+        "stdlib.h": "c",
+        "stdbool.h": "c"
     }
 }
