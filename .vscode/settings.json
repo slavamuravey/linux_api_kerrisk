@@ -24,6 +24,7 @@
         "strings.h": "c",
         "stdlib.h": "c",
         "stdbool.h": "c",
-        "file.h": "c"
+        "file.h": "c",
+        "typeinfo": "c"
     }
 }
