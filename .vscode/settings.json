@@ -30,6 +30,15 @@
         "functional": "c",
         "tuple": "c",
         "type_traits": "c",
-        "unistd.h": "c"
+        "unistd.h": "c",
+        "*.tcc": "c",
+        "deque": "c",
+        "list": "c",
+        "string": "c",
+        "vector": "c",
+        "algorithm": "c",
+        "limits": "c",
+        "numeric": "c",
+        "streambuf": "c"
     }
 }
