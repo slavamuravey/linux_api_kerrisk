@@ -40,6 +40,7 @@
         "limits": "c",
         "numeric": "c",
         "streambuf": "c",
-        "cstdlib": "c"
+        "cstdlib": "c",
+        "pthread.h": "c"
     }
 }
