@@ -85,7 +85,6 @@ void Pthread_join(pthread_t th, void **thread_return)
     }
 }
 
-
 void Pthread_sigmask(int how, const __sigset_t *newmask, __sigset_t *oldmask)
 {
     int s;
