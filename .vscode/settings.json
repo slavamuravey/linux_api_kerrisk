@@ -41,6 +41,8 @@
         "numeric": "c",
         "streambuf": "c",
         "cstdlib": "c",
-        "pthread.h": "c"
+        "pthread.h": "c",
+        "string.h": "c",
+        "libgen.h": "c"
     }
 }
