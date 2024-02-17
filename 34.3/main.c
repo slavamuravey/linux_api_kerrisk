@@ -36,7 +36,6 @@ int main(int argc, char *argv[])
     }
 
     if (pid == 0) {
-        char *cmd[3] = {"sleep", "1000", NULL};
         if (sigaction(SIGUSR1, &sa, NULL) == -1) {
             perror("sigaction");
             exit(1);
@@ -46,10 +45,13 @@ int main(int argc, char *argv[])
             exit(1);
         }
         printf("pgid is set\n");
+
+        if (setsid() == -1) {
+            perror("setsid");
+            exit(1);
+        }
         
-        execvp(*cmd, cmd);
-        perror(*cmd);
-        exit(1);
+        exit(0);
     }
 
     if (setpgid(pid, 0) == -1) {
@@ -61,15 +63,6 @@ int main(int argc, char *argv[])
         perror("kill");
         exit(1);
     }
-
-    sleep(1);
-
-    if (setpgid(pid, getpgid(getpid())) == -1) {
-        perror("setpgid");
-        exit(1);
-    }
-
-    printf("never executed\n");
 
     if (wait(NULL) == -1) {
         perror("wait");
