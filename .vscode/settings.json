@@ -43,6 +43,7 @@
         "cstdlib": "c",
         "pthread.h": "c",
         "string.h": "c",
-        "libgen.h": "c"
+        "libgen.h": "c",
+        "error_t.h": "c"
     }
 }
