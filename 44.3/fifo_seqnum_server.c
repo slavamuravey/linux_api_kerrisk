@@ -4,14 +4,33 @@
 
 int main(int argc, char *argv[])
 {
-    int serverFd, dummyFd, clientFd;
+    int serverFd, dummyFd, clientFd, seqFd;
     char clientFifo[CLIENT_FIFO_NAME_LEN];
     struct request req;
     struct response resp;
-    int seqNum = 0;
+    struct stat statBuf;
+    int seqNum;
+    char *seqFilename = "./seq.dat";
     umask(0);
     if (mkfifo(SERVER_FIFO, S_IRUSR | S_IWUSR | S_IWGRP) == -1 && errno != EEXIST) {
         errExit("mkfifo %s", SERVER_FIFO);
+    }
+
+    seqFd = open(seqFilename, O_RDWR | O_CREAT | O_SYNC, S_IRUSR | S_IWUSR | S_IWGRP);
+    if (seqFd == -1) {
+        errExit("open %s", seqFilename);
+    }
+    
+    if (fstat(seqFd, &statBuf)) {
+        errExit("fstat %d", seqFd);
+    }
+
+    if (statBuf.st_size == 0) {
+        seqNum = 0;
+    } else {
+        if (read(seqFd, &seqNum, sizeof(int)) == -1) {
+            errExit("read");
+        }
     }
         
     serverFd = open(SERVER_FIFO, O_RDONLY);
@@ -51,5 +70,13 @@ int main(int argc, char *argv[])
         }
 
         seqNum += req.seqLen;
+
+        if (lseek(seqFd, 0, SEEK_SET) == -1) {
+            errMsg("lseek");
+        }
+
+        if (write(seqFd, &seqNum, sizeof(int)) != sizeof(int)) {
+            fprintf(stderr, "Error writing to file %s\n", seqFilename);
+        }
     }
 }
