@@ -45,6 +45,11 @@
         "string.h": "c",
         "libgen.h": "c",
         "error_t.h": "c",
-        "fifo_seqnum.h": "c"
+        "fifo_seqnum.h": "c",
+        "resource.h": "c",
+        "times.h": "c",
+        "mman.h": "c",
+        "fcntl.h": "c",
+        "time.h": "c"
     }
 }
