@@ -58,7 +58,7 @@ int main(int argc, char *argv[])
 
     ps = sysconf(_SC_PAGESIZE);
 
-    p = mmap((void *)123, ps * 2, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+    p = mmap(NULL, ps * 2, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
     if (p == MAP_FAILED) {
         perror("mmap");
         exit(1);
