@@ -50,6 +50,7 @@
         "times.h": "c",
         "mman.h": "c",
         "fcntl.h": "c",
-        "time.h": "c"
+        "time.h": "c",
+        "getopt.h": "c"
     }
 }

@@ -1,8 +1,13 @@
+#define _POSIX_C_SOURCE 200112L
 #include <mqueue.h>
 #include <fcntl.h>              /* For definition of O_NONBLOCK */
 #include <unistd.h>
 #include <getopt.h>
+#include <time.h>
+#include <string.h>
 #include "../lib/tlpi_hdr.h"
+
+#define MQ_TIMEDRECEIVE_TIMEOUT_SEC 3
 
 extern int optind;
 
@@ -21,6 +26,8 @@ int main(int argc, char *argv[])
     void *buffer;
     struct mq_attr attr;
     ssize_t numRead;
+    struct timespec to;
+    memset(&to, 0, sizeof(to));
 
     flags = O_RDONLY;
     while ((opt = getopt(argc, argv, "n")) != -1) {
@@ -51,9 +58,12 @@ int main(int argc, char *argv[])
         errExit("malloc");
     }
 
-    numRead = mq_receive(mqd, buffer, attr.mq_msgsize, &prio);
+    clock_gettime(CLOCK_REALTIME, &to);
+    to.tv_sec += MQ_TIMEDRECEIVE_TIMEOUT_SEC;
+
+    numRead = mq_timedreceive(mqd, buffer, attr.mq_msgsize, &prio, &to);
     if (numRead == -1) {
-        errExit("mq_receive");
+        errExit("mq_timedreceive");
     }
 
     printf("Read %ld bytes; priority = %u\n", (long) numRead, prio);
