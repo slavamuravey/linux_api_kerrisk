@@ -1,7 +1,7 @@
 SRCMODULES = ../lib/error_functions.c ../lib/get_num.c
 
 .PHONY: build
-build: clean create unlink getattr receive send
+build: clean create unlink getattr receive timedreceive send
 
 -include ../include/main.mk
 
@@ -13,4 +13,4 @@ clean_%:
 	rm -f pmsg_$*.o pmsg_$*
 
 .PHONY: clean
-clean: clean_create clean_unlink clean_getattr clean_receive clean_send;
+clean: clean_create clean_unlink clean_getattr clean_receive clean_timedreceive clean_send;
