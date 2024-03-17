@@ -51,6 +51,8 @@
         "mman.h": "c",
         "fcntl.h": "c",
         "time.h": "c",
-        "getopt.h": "c"
+        "getopt.h": "c",
+        "pmsg_seqnum.h": "c",
+        "mqueue.h": "c"
     }
 }
