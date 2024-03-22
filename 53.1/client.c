@@ -28,7 +28,7 @@ int main(int argc, char *argv[])
     snprintf(cl_addr.sun_path, sizeof(cl_addr.sun_path), CL_SOCK_PATH_TPL, (long)getpid());
 
     if (bind(fd, (struct sockaddr *)&cl_addr, sizeof(struct sockaddr_un)) == -1) {
-        perror("socket");
+        perror("bind");
         exit(1);
     }
 

@@ -32,7 +32,7 @@ int main(int argc, char *argv[])
     }
 
     if (bind(fd, (struct sockaddr *)&srv_addr, sizeof(struct sockaddr_un)) == -1) {
-        perror("socket");
+        perror("bind");
         exit(1);
     }
 
