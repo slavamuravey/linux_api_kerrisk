@@ -54,6 +54,7 @@
         "getopt.h": "c",
         "pmsg_seqnum.h": "c",
         "mqueue.h": "c",
-        "us_seqnum.h": "c"
+        "us_seqnum.h": "c",
+        "us_xfr.h": "c"
     }
 }

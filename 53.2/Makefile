@@ -1,7 +1,7 @@
 SRCMODULES = ../lib/error_functions.c ../lib/get_num.c
 
 .PHONY: build
-build: clean cl sv
+build: clean cl sv cl_abs_ns sv_abs_ns
 
 -include ../include/main.mk
 
