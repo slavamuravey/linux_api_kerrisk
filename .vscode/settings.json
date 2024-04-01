@@ -55,6 +55,8 @@
         "pmsg_seqnum.h": "c",
         "mqueue.h": "c",
         "us_seqnum.h": "c",
-        "us_xfr.h": "c"
+        "us_xfr.h": "c",
+        "curr_time.h": "c",
+        "socket.h": "c"
     }
 }
