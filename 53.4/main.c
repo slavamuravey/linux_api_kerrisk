@@ -10,8 +10,6 @@
 #define SOCKET_PATH_A "/tmp/socket_a"
 #define SOCKET_PATH_B "/tmp/socket_b"
 
-#define BUF_SIZE 10
-
 int main(int argc, char *argv[])
 {
     int sock_a_fd, sock_b_fd, sock_fd;
