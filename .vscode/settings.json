@@ -57,6 +57,8 @@
         "us_seqnum.h": "c",
         "us_xfr.h": "c",
         "curr_time.h": "c",
-        "socket.h": "c"
+        "socket.h": "c",
+        "netdb.h": "c",
+        "is_seqnum.h": "c"
     }
 }
