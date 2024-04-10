@@ -48,6 +48,8 @@ int main(int argc, char *argv[])
         errExit("inetConnect");
     }
 
+    printf("%s\n", "successfully connected");
+
     switch (fork()) {
     case -1:
         errExit("fork");

@@ -60,6 +60,8 @@
         "socket.h": "c",
         "netdb.h": "c",
         "is_seqnum.h": "c",
-        "inet_sockets.h": "c"
+        "inet_sockets.h": "c",
+        "wait.h": "c",
+        "become_daemon.h": "c"
     }
 }

@@ -2,12 +2,15 @@
 #include <signal.h>
 #include <syslog.h>
 #include <sys/wait.h>
+#include <semaphore.h>
+#include <sys/mman.h>
 #include "../lib/become_daemon.h"
 #include "../lib/socket/inet_sockets.h"       /* Declarations of inet*() socket functions */
 #include "../lib/tlpi_hdr.h"
 
 #define SERVICE "echo"          /* Name of TCP service */
 #define BUF_SIZE 4096
+#define MAX_CON 4
 
 /* SIGCHLD handler to reap dead child processes */
 static void grimReaper(int sig)
@@ -45,6 +48,7 @@ int main(int argc, char *argv[])
 {
     int lfd, cfd;               /* Listening and connected sockets */
     struct sigaction sa;
+    sem_t *con_sem;
 
     if (becomeDaemon(0) == -1) {
         errExit("becomeDaemon");
@@ -66,7 +70,22 @@ int main(int argc, char *argv[])
         exit(EXIT_FAILURE);
     }
 
+    con_sem = mmap(NULL, sizeof(con_sem), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);
+    if (con_sem == MAP_FAILED) {
+        perror("mmap");
+        exit(1);
+    }
+
+    if (sem_init(con_sem, 1, MAX_CON) == -1) {
+        perror("sem_init");
+        exit(1);
+    }
+
     for (;;) {
+        if (sem_wait(con_sem) == -1) {
+            perror("sem_wait");
+            exit(1);
+        }
         cfd = accept(lfd, NULL, NULL);  /* Wait for connection */
         if (cfd == -1) {
             syslog(LOG_ERR, "Failure in accept(): %s", strerror(errno));
@@ -84,6 +103,10 @@ int main(int argc, char *argv[])
         case 0:                         /* Child */
             close(lfd);                 /* Unneeded copy of listening socket */
             handleRequest(cfd);
+            if (sem_post(con_sem) == -1) {
+                perror("sem_post");
+                exit(1);
+            }
             _exit(EXIT_SUCCESS);
 
         default:                        /* Parent */
