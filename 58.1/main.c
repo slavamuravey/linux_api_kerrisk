@@ -4,6 +4,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <stdlib.h>
 
 int my_isatty(int fd)
 {
@@ -25,6 +26,10 @@ int main(int argc, char *argv[])
 {
     int fd;
     fd = open("/dev/null", O_RDONLY);
+    if (fd == -1) {
+        perror("open");
+        exit(EXIT_FAILURE);
+    }
     
     test_isatty(STDIN_FILENO);
     test_isatty(fd);
