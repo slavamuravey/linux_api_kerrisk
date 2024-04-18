@@ -8,24 +8,23 @@
 #include <string.h>
 #include <errno.h>
 
-void handler(int s)
-{
-}
-
 int main(int argc, char *argv[])
 {
     pid_t pid;
     struct sigaction sa;
-    sigset_t set, emptyset;
+    sigset_t set;
 
     memset(&sa, 0, sizeof(sa));
-    sa.sa_handler = handler;
-    sigemptyset(&emptyset);
     sigemptyset(&set);
     sigaddset(&set, SIGUSR1);
 
     if (sigprocmask(SIG_SETMASK, &set, NULL) == -1) {
         perror("sigprocmask");
+        exit(1);
+    }
+
+    if (sigaction(SIGUSR1, &sa, NULL) == -1) {
+        perror("sigaction");
         exit(1);
     }
 
@@ -37,12 +36,9 @@ int main(int argc, char *argv[])
 
     if (pid == 0) {
         char *cmd[3] = {"sleep", "1000", NULL};
-        if (sigaction(SIGUSR1, &sa, NULL) == -1) {
-            perror("sigaction");
-            exit(1);
-        }
-        if (sigsuspend(&emptyset) == -1 && errno != EINTR) {
-            perror("sigsuspend");
+        
+        if (sigwaitinfo(&set, NULL) == -1) {
+            perror("sigwaitinfo");
             exit(1);
         }
         printf("pgid is set\n");
