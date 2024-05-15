@@ -65,6 +65,7 @@
         "become_daemon.h": "c",
         "dirent.h": "c",
         "termios.h": "c",
-        "ioctl.h": "c"
+        "ioctl.h": "c",
+        "select.h": "c"
     }
 }

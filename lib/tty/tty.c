@@ -1,3 +1,4 @@
+#define _XOPEN_SOURCE 600
 #include <fcntl.h>
 #include <termios.h>
 #include <stdlib.h>
@@ -5,6 +6,8 @@
 #include <sys/ioctl.h>
 #include <errno.h>
 #include <unistd.h>
+#include <string.h>
+#include <stdio.h>
 #include "tty.h"
 
 #define MAX_SNAME 1000
