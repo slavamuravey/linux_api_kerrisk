@@ -64,6 +64,7 @@
         "wait.h": "c",
         "become_daemon.h": "c",
         "dirent.h": "c",
-        "termios.h": "c"
+        "termios.h": "c",
+        "ioctl.h": "c"
     }
 }
