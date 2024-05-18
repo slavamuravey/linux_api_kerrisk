@@ -1,3 +1,4 @@
+#define _POSIX_C_SOURCE 1
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <libgen.h>
@@ -7,12 +8,14 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
+#include <time.h>
 #include "../lib/tty/tty.h" 
 
 #define BUF_SIZE 256
 #define MAX_SNAME 1000
 
 struct termios tty_orig;
+static FILE *script_stream;
 
 static void tty_reset(void)
 {
@@ -20,6 +23,23 @@ static void tty_reset(void)
         perror("tcsetattr");
         exit(1);
     }
+}
+
+static char *get_curr_time_str()
+{
+    time_t rawtime;
+    struct tm *timeinfo;
+
+    rawtime = time(NULL);
+    timeinfo = localtime(&rawtime);
+    
+    return asctime(timeinfo);
+}
+
+static void exit_func(void)
+{
+    fprintf(script_stream, "Script done on %s", get_curr_time_str());
+    tty_reset();
 }
 
 int main(int argc, char *argv[])
@@ -32,8 +52,6 @@ int main(int argc, char *argv[])
     char buf[BUF_SIZE];
     ssize_t num_read;
     pid_t child_pid;
-
-    /* Retrieve the attributes of terminal on which we are started */
 
     if (tcgetattr(STDIN_FILENO, &tty_orig) == -1) {
         perror("tcgetattr");
@@ -61,8 +79,8 @@ int main(int argc, char *argv[])
         exit(1);
     }
 
-    script_fd = open((
-        argc > 1) ? argv[1] : "typescript", 
+    script_fd = open(
+        (argc > 1) ? argv[1] : "typescript", 
         O_WRONLY | O_CREAT | O_TRUNC, 
         S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH
     );
@@ -71,12 +89,17 @@ int main(int argc, char *argv[])
         exit(1);
     }
 
+    script_stream = fdopen(script_fd, "a");
+    setbuf(script_stream, NULL);
+
     tty_set_raw(STDIN_FILENO, &tty_orig);
 
-    if (atexit(tty_reset) != 0) {
+    if (atexit(exit_func) != 0) {
         perror("atexit");
         exit(1);
     }
+
+    fprintf(script_stream, "Script started on %s", get_curr_time_str());
 
     for (;;) {
         FD_ZERO(&in_fds);

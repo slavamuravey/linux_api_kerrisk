@@ -66,6 +66,7 @@
         "dirent.h": "c",
         "termios.h": "c",
         "ioctl.h": "c",
-        "select.h": "c"
+        "select.h": "c",
+        "tty.h": "c"
     }
 }
