@@ -9,6 +9,8 @@
 #include <unistd.h>
 #include <string.h>
 #include <time.h>
+#include <errno.h>
+#include <signal.h>
 #include "../lib/tty/tty.h" 
 
 #define BUF_SIZE 256
@@ -42,22 +44,35 @@ static void exit_func(void)
     tty_reset();
 }
 
+void sigwinch_handler(int sig) {
+}
+
 int main(int argc, char *argv[])
 {
     char slave_name[MAX_SNAME];
     char *shell;
     int master_fd, script_fd;
-    struct winsize ws;
+    struct winsize ws, new_ws;
     fd_set in_fds;
     char buf[BUF_SIZE];
     ssize_t num_read;
     pid_t child_pid;
-
+    struct sigaction sa;
+    sigemptyset(&sa.sa_mask);
+    sa.sa_flags = 0;
+    sa.sa_handler = sigwinch_handler;
+    
+    if (sigaction(SIGWINCH, &sa, NULL) == -1) {
+        perror("sigaction");
+        exit(1);
+    }
+    
     if (tcgetattr(STDIN_FILENO, &tty_orig) == -1) {
         perror("tcgetattr");
         exit(1);
     }
-    if (ioctl(STDIN_FILENO, TIOCGWINSZ, &ws) < 0) {
+    
+    if (ioctl(STDIN_FILENO, TIOCGWINSZ, &ws) == -1) {
         perror("ioctl");
         exit(1);
     }
@@ -102,11 +117,27 @@ int main(int argc, char *argv[])
     fprintf(script_stream, "Script started on %s", get_curr_time_str());
 
     for (;;) {
+        int sd;
         FD_ZERO(&in_fds);
         FD_SET(STDIN_FILENO, &in_fds);
         FD_SET(master_fd, &in_fds);
 
-        if (select(master_fd + 1, &in_fds, NULL, NULL, NULL) == -1) {
+        sd = select(master_fd + 1, &in_fds, NULL, NULL, NULL);
+        if (sd == -1) {
+            if (errno == EINTR) {
+                if (ioctl(STDIN_FILENO, TIOCGWINSZ, &new_ws) == -1) {
+                    perror("ioctl");
+                    exit(1);
+                }
+
+                if (ioctl(master_fd, TIOCSWINSZ, &new_ws) == -1) {
+                    perror("ioctl");
+                    exit(1);
+                }
+                
+                continue;
+            }
+            
             perror("select");
             exit(1);
         }
@@ -133,6 +164,7 @@ int main(int argc, char *argv[])
                 fprintf(stderr, "partial/failed write\n");
                 exit(1);
             }
+            
             if (write(script_fd, buf, num_read) != num_read) {
                 fprintf(stderr, "partial/failed write\n");
                 exit(1);
