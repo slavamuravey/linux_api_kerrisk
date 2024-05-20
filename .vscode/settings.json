@@ -67,6 +67,7 @@
         "termios.h": "c",
         "ioctl.h": "c",
         "select.h": "c",
-        "tty.h": "c"
+        "tty.h": "c",
+        "time_t.h": "c"
     }
 }
