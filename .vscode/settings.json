@@ -68,6 +68,7 @@
         "ioctl.h": "c",
         "select.h": "c",
         "tty.h": "c",
-        "time_t.h": "c"
+        "time_t.h": "c",
+        "sockaddr.h": "c"
     }
 }
