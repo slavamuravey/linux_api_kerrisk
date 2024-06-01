@@ -69,6 +69,7 @@
         "select.h": "c",
         "tty.h": "c",
         "time_t.h": "c",
-        "sockaddr.h": "c"
+        "sockaddr.h": "c",
+        "signal_ext.h": "c"
     }
 }
