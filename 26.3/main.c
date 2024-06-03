@@ -5,7 +5,7 @@
 
 int main(int argc, char *argv[])
 {
-    int status;
+    siginfo_t infop;
     pid_t childPid;
 
     if (argc > 1 && strcmp(argv[1], "--help") == 0) {
@@ -30,23 +30,21 @@ int main(int argc, char *argv[])
     default:            /* Parent: repeatedly wait on child until it
                            either exits or is terminated by a signal */
         for (;;) {
-            childPid = waitpid(-1, &status, WUNTRACED
+            memset(&infop, 0, sizeof(siginfo_t));
+            childPid = waitid(P_ALL, 0, &infop, WEXITED | WUNTRACED
 #ifdef WCONTINUED       /* Not present on older versions of Linux */
                                                 | WCONTINUED
 #endif
                     );
             if (childPid == -1) {
-                errExit("waitpid");
+                errExit("waitid");
             }
 
             /* Print status in hex, and as separate decimal bytes */
+            printf("waitid() returned: PID=%ld\n", (long) infop.si_pid);
+            printWaitStatus(NULL, &infop);
 
-            printf("waitpid() returned: PID=%ld; status=0x%04x (%d,%d)\n",
-                    (long) childPid,
-                    (unsigned int) status, status >> 8, status & 0xff);
-            printWaitStatus(NULL, status);
-
-            if (WIFEXITED(status) || WIFSIGNALED(status)) {
+            if (WIFEXITED(infop.si_status) || WIFSIGNALED(infop.si_status)) {
                 exit(EXIT_SUCCESS);
             }
         }
