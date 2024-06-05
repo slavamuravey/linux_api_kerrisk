@@ -1,3 +1,6 @@
+/*
+    To test the example run: exec ./main d s s > sig.log 2>&1
+*/
 #define _GNU_SOURCE     
 #include <string.h>
 #include <signal.h>
@@ -13,6 +16,8 @@ int main(int argc, char *argv[])
     pid_t parentPid, childPid;
     int j;
     struct sigaction sa;
+
+    signal(SIGHUP, SIG_IGN);
 
     if (argc < 2 || strcmp(argv[1], "--help") == 0) {
         usageErr("%s {d|s}... [ > sig.log 2>&1 ]\n", argv[0]);
