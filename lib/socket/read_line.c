@@ -55,3 +55,56 @@ ssize_t readLine(int fd, void *buffer, size_t n)
     *buf = '\0';
     return totRead;
 }
+
+void readLineBufInit(int fd, struct readLineBuf *rlbuf)
+{
+    rlbuf->fd = fd;
+    rlbuf->len = 0;
+    rlbuf->next = 0;
+}
+
+ssize_t readLineBuf(struct readLineBuf *rlbuf, char *buffer, size_t n)
+{
+    size_t totRead;   
+    char ch;                  
+
+    if (n <= 0 || buffer == NULL) {
+        errno = EINVAL;
+        return -1;
+    }
+
+    totRead = 0;
+    for (;;) {
+        if (rlbuf->next >= rlbuf->len) {
+            rlbuf->len = read(rlbuf->fd, rlbuf->buf, RL_MAX_BUF);
+            if (rlbuf->len == -1) {
+                if (errno == EINTR) {         
+                    continue;
+                } else {
+                    return -1;              
+                }
+            }
+            
+            if (rlbuf->len == 0) {      
+                break;
+            }
+
+            rlbuf->next = 0;
+        }
+
+        ch = rlbuf->buf[rlbuf->next];
+        rlbuf->next++;
+
+        if (totRead < n) {
+            buffer[totRead++] = ch;
+        }
+
+        if (ch == '\n') {
+            break;
+        }
+    }
+
+    buffer[totRead] = '\0';
+
+    return totRead;
+}

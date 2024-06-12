@@ -12,6 +12,7 @@ int main(int argc, char *argv[])
     ssize_t numRead;
     struct addrinfo hints;
     struct addrinfo *result, *rp;
+    struct readLineBuf rlbuf;
 
     if (argc < 2 || strcmp(argv[1], "--help") == 0) {
         usageErr("%s server-host [sequence-len]\n", argv[0]);
@@ -69,7 +70,8 @@ int main(int argc, char *argv[])
 
     /* Read and display sequence number returned by server */
 
-    numRead = readLine(cfd, seqNumStr, INT_LEN);
+    readLineBufInit(cfd, &rlbuf);
+    numRead = readLineBuf(&rlbuf, seqNumStr, INT_LEN);
     if (numRead == -1) {
         errExit("readLine");
     }
