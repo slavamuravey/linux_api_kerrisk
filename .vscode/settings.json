@@ -71,6 +71,7 @@
         "time_t.h": "c",
         "sockaddr.h": "c",
         "signal_ext.h": "c",
-        "un.h": "c"
+        "un.h": "c",
+        "stat.h": "c"
     }
 }
