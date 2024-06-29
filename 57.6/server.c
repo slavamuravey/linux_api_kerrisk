@@ -220,11 +220,11 @@ void server_run(struct server *server)
                 }
 
                 if (nbytes == 0) {
-                    dynamic_array_remove(&server->cons, i);
                     shutdown(con.sock, SHUT_RDWR);
                     shutdown(con.urg_sock, SHUT_RDWR);
                     close(con.sock);
                     close(con.urg_sock);
+                    dynamic_array_remove(&server->cons, i);
                     
                     printf("connection closed\n");
                     printf("[connections count: %ld]\n", server->cons.len);
