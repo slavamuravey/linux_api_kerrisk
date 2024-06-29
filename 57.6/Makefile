@@ -1,4 +1,4 @@
-SRCMODULES = common.c /usr/lib/x86_64-linux-gnu/libuuid.so
+SRCMODULES = common.c dynamic_array.c /usr/lib/x86_64-linux-gnu/libuuid.so
 
 .PHONY: build
 build: clean client server

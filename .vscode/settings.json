@@ -72,6 +72,8 @@
         "sockaddr.h": "c",
         "signal_ext.h": "c",
         "un.h": "c",
-        "stat.h": "c"
+        "stat.h": "c",
+        "common.h": "c",
+        "dynamic_array.h": "c"
     }
 }

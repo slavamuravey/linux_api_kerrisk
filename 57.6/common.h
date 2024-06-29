@@ -3,6 +3,8 @@
 
 #include <inttypes.h>
 
+#define BUFSIZE 4096
+
 typedef char uuid_str_t[37];
 
 struct urg_handshake_req {
