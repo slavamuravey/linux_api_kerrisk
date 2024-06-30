@@ -51,7 +51,7 @@ int main(int argc, char *argv[])
 
     ready = select(fd_max + 1, &in_fds, NULL, NULL, NULL);
     if (ready == -1) {
-        errExit("poll");
+        errExit("select");
     }
 
     printf("select() returned: %d\n", ready);
