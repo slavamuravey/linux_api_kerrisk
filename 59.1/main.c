@@ -1,13 +1,14 @@
 #define _XOPEN_SOURCE 500
 #include <time.h>
-#include <poll.h>
+#include <sys/select.h>
 #include "../lib/tlpi_hdr.h"
 
 int main(int argc, char *argv[])
 {
     int numPipes, ready, randPipe, numWrites, j;
-    struct pollfd *pollFd;
     int (*pfds)[2];
+    fd_set in_fds;
+    int fd_max;
 
     if (argc < 2 || strcmp(argv[1], "--help") == 0) {
         usageErr("%s num-pipes [num-writes]\n", argv[0]);
@@ -21,11 +22,6 @@ int main(int argc, char *argv[])
         errExit("calloc");
     }
         
-    pollFd = calloc(numPipes, sizeof(struct pollfd));
-    if (pollFd == NULL) {
-        errExit("calloc");
-    }
-
     for (j = 0; j < numPipes; j++) {
         if (pipe(pfds[j]) == -1) {
             errExit("pipe %d", j);
@@ -41,21 +37,28 @@ int main(int argc, char *argv[])
         }
     }
 
+    FD_ZERO(&in_fds);
+
+    fd_max = -1;
+
     for (j = 0; j < numPipes; j++) {
-        pollFd[j].fd = pfds[j][0];
-        pollFd[j].events = POLLIN;
+        if (pfds[j][0] > fd_max) {
+            fd_max = pfds[j][0];
+        }
+        
+        FD_SET(pfds[j][0], &in_fds);
     }
 
-    ready = poll(pollFd, numPipes, 0);
+    ready = select(fd_max + 1, &in_fds, NULL, NULL, NULL);
     if (ready == -1) {
         errExit("poll");
     }
 
-    printf("poll() returned: %d\n", ready);
+    printf("select() returned: %d\n", ready);
 
     for (j = 0; j < numPipes; j++) {
-        if (pollFd[j].revents & POLLIN) {
-            printf("Readable: %3d\n", pollFd[j].fd);
+        if (FD_ISSET(pfds[j][0], &in_fds)) {
+            printf("Readable: %3d\n", pfds[j][0]);
         }
     }
 
