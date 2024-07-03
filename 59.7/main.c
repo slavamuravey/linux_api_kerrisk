@@ -8,9 +8,10 @@
 
 static volatile sig_atomic_t gotSigio = 0;
 
-static void sigioHandler(int sig)
+static void sigioHandler(int sig, siginfo_t *si, void *ucontext)
 {
     gotSigio = 1;
+    printf("si_fd: %d, si_code: %d\n", si->si_fd, si->si_code);
 }
 
 int main(int argc, char *argv[])
@@ -20,16 +21,23 @@ int main(int argc, char *argv[])
     char ch;
     struct sigaction sa;
     Boolean done;
+    int RT_SIGIO;
+    
+    RT_SIGIO = SIGRTMIN + 5;
 
     sigemptyset(&sa.sa_mask);
-    sa.sa_flags = SA_RESTART;
-    sa.sa_handler = sigioHandler;
-    if (sigaction(SIGIO, &sa, NULL) == -1) {
+    sa.sa_flags = SA_RESTART | SA_SIGINFO;
+    sa.sa_sigaction = sigioHandler;
+    if (sigaction(RT_SIGIO, &sa, NULL) == -1) {
         errExit("sigaction");
     }
 
     if (fcntl(STDIN_FILENO, F_SETOWN, getpid()) == -1) {
         errExit("fcntl(F_SETOWN)");
+    }
+
+    if (fcntl(STDIN_FILENO, F_SETSIG, RT_SIGIO) == -1) {
+        errExit("fcntl");
     }
 
     flags = fcntl(STDIN_FILENO, F_GETFL);
@@ -38,7 +46,7 @@ int main(int argc, char *argv[])
     }
 
     if (tty_set_cbreak(STDIN_FILENO, &origTermios) == -1) {
-        errExit("ttySetCbreak");
+        errExit("tty_set_cbreak");
     }
 
     for (done = FALSE, cnt = 0; !done ; cnt++) {
