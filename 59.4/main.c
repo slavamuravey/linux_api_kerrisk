@@ -1,8 +1,8 @@
 #define _GNU_SOURCE
 #include <sys/time.h>
-#include <sys/select.h>
 #include <fcntl.h>
 #include <signal.h>
+#include <poll.h>
 #include "../lib/tlpi_hdr.h"
 
 static int pfd[2];
@@ -21,48 +21,42 @@ static void handler(int sig)
 
 int main(int argc, char *argv[])
 {
-    fd_set readfds;
     int ready, nfds, flags;
-    struct timeval timeout;
-    struct timeval *pto;
+    int pto;
     struct sigaction sa;
     char ch;
     int fd, j;
+    struct pollfd *fds;
 
     if (argc < 2 || strcmp(argv[1], "--help") == 0) {
         usageErr("%s {timeout|-} fd...\n\t\t('-' means infinite timeout)\n", argv[0]);
     }
 
     if (strcmp(argv[1], "-") == 0) {
-        pto = NULL;
+        pto = -1;
     } else {
-        pto = &timeout;
-        timeout.tv_sec = getLong(argv[1], 0, "timeout");
-        timeout.tv_usec = 0;
+        pto = getLong(argv[1], 0, "timeout") * 1000;
     }
 
-    nfds = 0;
+    nfds = argc - 1;
+    
+    fds = calloc(nfds, sizeof(struct pollfd));
+    if (fds == NULL) {
+        errExit("calloc");
+    }
 
-    FD_ZERO(&readfds);
-    for (j = 2; j < argc; j++) {
-        fd = getInt(argv[j], 0, "fd");
-        if (fd >= FD_SETSIZE) {
-            cmdLineErr("file descriptor exceeds limit (%d)\n", FD_SETSIZE);
-        }
-            
-        if (fd >= nfds) {
-            nfds = fd + 1;
-        }
-
-        FD_SET(fd, &readfds);
+    for (j = 0; j < nfds - 1; j++) {
+        fd = getInt(argv[j + 2], 0, "fd");
+        fds[j].fd = fd;
+        fds[j].events = POLLIN;
     }
 
     if (pipe(pfd) == -1) {
         errExit("pipe");
     }
 
-    FD_SET(pfd[0], &readfds);
-    nfds = max(nfds, pfd[0] + 1);
+    fds[j].fd = pfd[0];
+    fds[j].events = POLLIN;
 
     flags = fcntl(pfd[0], F_GETFL);
     if (flags == -1) {
@@ -91,15 +85,15 @@ int main(int argc, char *argv[])
         errExit("sigaction");
     }
 
-    while ((ready = select(nfds, &readfds, NULL, NULL, pto)) == -1 && errno == EINTR) {
+    while ((ready = poll(fds, nfds, pto)) == -1 && errno == EINTR) {
         continue;
     }
 
     if (ready == -1) {
-        errExit("select");
+        errExit("poll");
     }
 
-    if (FD_ISSET(pfd[0], &readfds)) {
+    if (fds[j].revents & POLLIN) {
         printf("A signal was caught\n");
 
         for (;;) {
@@ -115,16 +109,12 @@ int main(int argc, char *argv[])
 
     printf("ready = %d\n", ready);
     
-    for (j = 2; j < argc; j++) {
-        fd = getInt(argv[j], 0, "fd");
-        printf("%d: %s\n", fd, FD_ISSET(fd, &readfds) ? "r" : "");
+    for (j = 0; j < nfds - 1; j++) {
+        fd = getInt(argv[j + 2], 0, "fd");
+        printf("%d: %s\n", fd, fds[j].revents & POLLIN ? "r" : "");
     }
 
-    printf("%d: %s   (read end of pipe)\n", pfd[0], FD_ISSET(pfd[0], &readfds) ? "r" : "");
+    printf("%d: %s   (read end of pipe)\n", pfd[0], fds[j].revents & POLLIN ? "r" : "");
 
-    if (pto != NULL) {
-        printf("timeout after select(): %ld.%03ld\n", (long) timeout.tv_sec, (long) timeout.tv_usec / 1000);
-    }
-        
     exit(EXIT_SUCCESS);
 }
